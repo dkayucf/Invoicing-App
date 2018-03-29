@@ -346,6 +346,7 @@ const ItemCtrl = (function(){
                     subtotal += item.itemAmount;
                 });
             }
+
             return subtotal;
         },
         updateInvoiceStatus:(retrievedData)=> {
@@ -358,15 +359,22 @@ const ItemCtrl = (function(){
             });   
         },
         updateInvoiceItem:(itemID, newInput)=>{
+            let itemQuantity = parseInt(newInput.quantity),
+                unitPrice = parseFloat(newInput.unitPrice),
+                itemAmount = parseFloat(newInput.itemAmount);
+            
+            console.log(newInput);
+            console.log(itemQuantity, unitPrice, itemAmount);
             invoiceData.invoiceItems.forEach(item=>{
                 if(item.id === itemID){
-                    item.itemAmount = newInput.itemAmount;
-                    item.itemDescription = newInput.itemDescription;
-                    item.itemQuantity = newInput.itemQuantity;
+                    item.itemAmount = itemAmount;
+                    item.itemDescription = newInput.description;
+                    item.itemQuantity = itemQuantity;
                     item.itemType = newInput.itemType;
-                    item.itemUnitPrice = newInput.itemUnitPrice;
+                    item.itemUnitPrice = unitPrice;
                 }    
-            });      
+            }); 
+
         },
         getUSStates:()=>{
             return usStates;     
@@ -540,7 +548,6 @@ const UICtrl = (function($){
             document.querySelector(UISelectors.businessZip).value = businessData.businessZip
         },
         displayFoundItems:(retrievedItem)=>{
-            console.log(retrievedItem);
             document.querySelector(UISelectors.invItemId).value = retrievedItem.id;
             document.querySelector(UISelectors.itemType).value = retrievedItem.itemType;
             document.querySelector(UISelectors.description).value = retrievedItem.itemDescription;
@@ -1095,7 +1102,7 @@ const AppCtrl = (function(StorageCtrl, ItemCtrl, UICtrl, StateCtrl, $){
               updatedInputs = UICtrl.getItemInputs();
         
         if(ItemCtrl.retrieveInvoiceItems().length > 0){
-        
+
             ItemCtrl.updateInvoiceItem(itemId, updatedInputs);
             
         }else{
@@ -1215,7 +1222,7 @@ const AppCtrl = (function(StorageCtrl, ItemCtrl, UICtrl, StateCtrl, $){
         }else {
             retrievedStorage = StorageCtrl.retrieveInvoiceItems(key, invoiceId, itemId);
         }
-    
+
         UICtrl.displayFoundItems(retrievedStorage);
         
         StateCtrl.editItemState();
