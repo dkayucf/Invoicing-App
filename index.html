@@ -1,0 +1,500 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>Invoicing</title>
+</head>
+<script src="assets/js/fontawesome-all.min.js"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/gijgo/1.9.4/combined/css/gijgo.min.css">
+<link rel="stylesheet" href="assets/css/bootstrap.min.css">
+<link rel="stylesheet" href="assets/css/style.css">
+
+<body>
+    <div class="container-fluid">
+        <div class="row">
+            <div class=" col-md-12">
+                <div class="card m-4" id="mainCard">
+                    <div class="card-header bg-secondary pt-4">
+                        <div class="container-fluid">
+                            <div class="row">
+                                <div class="col-lg-3 col-md-4">
+                                   <div class="input-group input-group-sm">
+                                        <select class="custom-select form-control  mb-2 float-right invoicesDue invoiceSelects">
+                                              <option selected>Invoices Due...</option>
+                                        </select>   
+                                   </div>
+                                </div>
+                                <div class="col-lg-3 col-md-4">
+                                   <div class="input-group input-group-sm">
+                                        <select class="custom-select form-control  mb-2 float-right invoicesPastDue  invoiceSelects">
+                                              <option selected>Past Due...</option>
+                                        </select>   
+                                   </div>
+                                </div>
+                                <div class="col-lg-3 col-md-4">
+                                   <div class="input-group input-group-sm">
+                                        <select class="custom-select form-control  mb-2 float-right invoicesPaid  invoiceSelects">
+                                              <option selected>Paid...</option>
+                                        </select>   
+                                   </div>
+                                </div>
+                                <div class="col-lg-3 col-md-4">
+                                    <div class="btn-group" role="group" aria-label="">
+                                        <button type="button" class="btn btn-sm btn-light pdfView"><i class="far fa-file-pdf mr-2"></i>PDF</button>
+                                        <button type="button" class="btn btn-sm btn-primary printInvoice"><i class="fas fa-print mr-2"></i>Print</button>
+                                        <button type="button" class="btn btn-sm btn-success newInvoice"><i class="far fa-file-alt mr-2"></i>New Invoice</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card-body bg-light pt-3 border border-secondary">
+                        <div class="container-fluid">
+                            <div class="row">
+                                <div class=" col-md-12">
+                                    <div class="card" id="invoiceCard">
+                                        <div class="card-body">
+                                            <div class="container-fluid">
+                                                <div class="row d-flex justify-content-between">
+                                                    <div class="col-lg-3 col-md-5 mb-3">
+                                                        <form action="/file-upload" class="dropzone p-5 text-center" id="logoDropZone">
+                                                            <div class="fallback">
+                                                                <input name="file" type="file" multiple />
+                                                            </div>
+                                                        </form>
+                                                    </div>
+                                                    <div class="col-lg-6 col-md-6 d-flex flex-column justify-content-center">
+                                                        <div class="input-group  input-group-sm mb-3">
+                                                            <div class="input-group-prepend">
+                                                                <button class="btn btn-sm btn-danger deletePerson" type="button"><i class="far fa-trash-alt"></i></button>
+                                                            </div>
+                                                            <select class="custom-select form-control   salesPersonSelect">
+                                                                <option selected>Sales Person...</option>
+                                                                <option value="1">One</option>
+                                                                <option value="2">Two</option>
+                                                                <option value="3">Three</option>
+                                                            </select>
+                                                            <div class="input-group-append">
+                                                                <button class="btn btn-sm btn-primary addSalesPerson" type="button" data-toggle="modal" data-target="#salesPersonModal"><i class="fas fa-plus mr-2"></i>Add Sales Person</button>
+                                                            </div>
+                                                        </div>
+                                                        <div class="input-group input-group-sm">
+                                                            <div class="input-group-prepend">
+                                                                <button class="btn btn-sm btn-danger deleteVendor" type="button"><i class="far fa-trash-alt"></i></button>
+                                                            </div>
+                                                            <select class="custom-select form-control   vendorsSelect">
+                                                                <option selected hidden="">Select Vendors...</option>
+                                                            </select>
+                                                            <div class="input-group-append">
+                                                                <button class="btn btn-sm btn-primary addVendors" type="button" data-toggle="modal" data-target="#addVendorModal"><i class="fas fa-plus mr-2"></i>Add Vendors</button>
+                                                            </div>
+                                                        </div>
+                                                        
+                                                        <div id="parentAlert2">
+                                                            <div id="childAlert2"></div>
+                                                        </div>    
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="container-fluid mt-4">
+                                                <div class="row">
+                                                    <div class="col-lg-4 col-md-4">
+                                                       <h1 class="display-4 font-weight-bold">INVOICE</h1>
+                                                        <div class="row">
+                                                            <div class="col-lg-7 col-md-12">
+                                                                
+                                                                <div class="form-group">
+                                                                    <label for="invoiceId">Invoice ID:</label>
+                                                                    <input type="number" class="form-control form-control-sm invoiceId">
+                                                                </div>
+                                                                <div class="form-group">
+                                                                    <label for="issueDate">Issue Date:</label>
+                                                                    <div class="input-group">
+                                                                        <input type="text" class="form-control form-control-sm issueDate" aria-label="Issue Date">
+                                                                    </div>
+                                                                </div>
+                                                                <div class="form-group">
+                                                                    <label for="dueDate">Due Date:</label>
+                                                                    <div class="input-group">
+                                                                        <input type="text" class="form-control form-control-sm dueDate">
+                                                                    </div>
+                                                                </div>
+                                                                <div class="form-group">
+                                                                    <label for="invoiceSubject">Subject:</label>
+                                                                    <input type="text" class="form-control form-control-sm invoiceSubject">
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-lg-4 col-md-4 mt-4">
+                                                        <div class="card">
+                                                            <div class="card-header d-inline-flex">
+                                                                <h4 class="mr-auto">From</h4>
+                                                                <button class="btn btn-sm btn-warning editBusiness" type="button" style="display: none;"><i class="far fa-edit mr-2"></i>Edit Business</button>
+                                                                <button class="btn btn-sm btn-primary saveBusiness" type="button"><i class="far fa-save mr-2"></i>Save Businees</button>
+                                                                <button class="btn btn-sm btn-secondary backBtn2 ml-3" type="button" style="display: none;"><i class="fas fa-chevron-left mr-2"></i>Back</button>
+
+                                                            </div>
+                                                            <div class="card-body">
+                                                                <div class="form-group">
+                                                                    <label for="bussiness-name">Business Name:</label>
+                                                                    <input type="text" class="form-control form-control-sm businessName">
+                                                                </div>
+                                                                <div class="form-group">
+                                                                    <label for="businessAddress">Address:</label>
+                                                                    <input type="text" class="form-control form-control-sm businessAddress">
+                                                                </div>
+                                                                <div class="form-group">
+                                                                    <label for="businessCity">City:</label>
+                                                                    <input type="text" class="form-control form-control-sm businessCity">
+                                                                </div>
+                                                                <div class="row">
+                                                                    <div class="col-md-6">
+                                                                        <div class="form-group">
+                                                                            <label for="businessState">State:</label>
+                                                                            <select class="form-control  form-control-sm businessState states"> </select>
+                                                                        </div>
+                                                                    </div>
+                                                                    <div class="col-md-6">
+                                                                        <div class="form-group">
+                                                                            <label for="businessZip">Zip code:</label>
+                                                                            <input type="number" class="form-control form-control-sm businessZip">
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-lg-4 col-md-4 mt-4">
+                                                        <div class="card">
+                                                            <div class="card-header d-inline-flex">
+                                                                <h4 class="mr-auto">To</h4>
+                                                                <button class="btn btn-sm btn-warning editVendor" type="button" style="display: none;"><i class="far fa-edit mr-2"></i>Edit Vendor</button>
+                                                                <button class="btn btn-sm btn-success updateVendor" type="button" style="display: none;"><i class="far fa-save mr-2"></i>Update Vendor</button>
+                                                                <button class="btn btn-sm btn-secondary btn-sm ml-3" id="backBtn1" type="button" style="display: none;"><i class="fas fa-chevron-left mr-2"></i>Back</button>
+                                                            </div>
+                                                            <div class="card-body">
+                                                                <div class="form-group">
+                                                                    <label for="bussiness-name">Vendor Name:</label>
+                                                                    <input type="text" class="form-control form-control-sm vendorName" disabled>
+                                                                </div>
+                                                                <div class="form-group">
+                                                                    <label for="vendorAddress">Address:</label>
+                                                                    <input type="text" class="form-control form-control-sm vendorAddress" disabled>
+                                                                </div>
+                                                                <div class="form-group">
+                                                                    <label for="vendorCity">City:</label>
+                                                                    <input type="text" class="form-control form-control-sm vendorCity" disabled>
+                                                                </div>
+                                                                <div class="row">
+                                                                    <div class="col-md-6">
+                                                                        <div class="form-group">
+                                                                            <label for="vendorState">State:</label>
+                                                                            <select class="form-control  form-control-sm vendorState states" disabled> </select>
+                                                                        </div>
+                                                                    </div>
+                                                                    <div class="col-md-6">
+                                                                        <div class="form-group">
+                                                                            <label for="vendorZip">Zip code:</label>
+                                                                            <input type="number" class="form-control form-control-sm vendorZip" disabled>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="container-fluid">
+                                                <div class="row">
+                                                    <div class="col-md-12 mt-3">
+                                                        <div class="card">
+                                                            <div class="card-body">
+                                                                <div class="container-fluid">
+                                                                    <div class="row">
+                                                                        <input type="hidden" class="invItemId">
+                                                                        <div class="col-md-3">
+                                                                            <div class="form-group">
+                                                                                <label for="itemType">Item Type:</label>
+                                                                                <div class="input-group input-group-sm">
+                                                                                    <select class="custom-select form-control  itemType">
+                                                                                        <option selected>Select Item Type...</option>
+                                                                                        <option value="One">One</option>
+                                                                                        <option value="Two">Two</option>
+                                                                                        <option value="Three">Three</option>
+                                                                                    </select>
+                                                                                    <div class="input-group-append">
+                                                                                        <button class="btn btn-sm btn-primary addItemType" type="button" data-toggle="modal" data-target="#itemTypeModal"><i class="fas fa-plus"></i></button>
+                                                                                    </div>
+                                                                                </div>
+                                                                            </div>
+                                                                        </div>
+                                                                        <div class="col-md-3">
+                                                                            <div class="form-group">
+                                                                                <label for="description">Description:</label>
+                                                                                <textarea class="form-control form-control-sm description" rows="1"></textarea>
+                                                                            </div>
+                                                                        </div>
+                                                                        <div class="col-md-2">
+                                                                            <div class="form-group">
+                                                                                <label for="quantity">Quantity:</label>
+                                                                                <input type="number" class="form-control form-control-sm quantity">
+                                                                            </div>
+                                                                        </div>
+                                                                        <div class="col-md-2">
+                                                                            <div class="form-group">
+                                                                                <label for="unitPrice">Unit Price:</label>
+                                                                                <div class="input-group  input-group-sm">
+                                                                                    <div class="input-group-prepend">
+                                                                                        <span class="input-group-text"><i class="fas fa-dollar-sign"></i></span>
+                                                                                    </div>
+                                                                                    <input type="number" class="form-control unitPrice">
+                                                                                </div>
+                                                                            </div>
+                                                                        </div>
+                                                                        <div class="col-md-2">
+                                                                            <div class="form-group">
+                                                                                <label for="itemAmount">Amount:</label>
+                                                                                <div class="input-group  input-group-sm">
+                                                                                    <div class="input-group-prepend">
+                                                                                        <span class="input-group-text"><i class="fas fa-dollar-sign"></i></span>
+                                                                                    </div>
+                                                                                    <input type="number" class="form-control itemAmount" disabled>
+                                                                                </div>
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                                <div class="container-fluid">
+                                                                    <div class="row">
+                                                                        <div class="col-md-12">
+                                                                            <div class="row">
+                                                                                <div class="col-md-7"></div>
+                                                                                <div class="col-md-3 d-flex flex-row align-items-end justify-content-end">
+                                                                                    <div id="parentAlert3">
+                                                                                        <div id="childAlert3"></div>
+                                                                                    </div>
+                                                                                </div>
+                                                                                <div class="col-md-2">
+                                                                                    <button class="btn btn-sm btn-secondary float-right mt-3 ml-3" type="button" id="backBtn3" style="display: none;"><i class="fas fa-chevron-left mr-2"></i>Back</button>
+                                                                                    <button type="button" class="btn btn-sm btn-warning float-right mt-3 updateItem" style="display: none;"><i class="far fa-save mr-2"></i>Update Item</button>
+                                                                                    <button type="button" class="btn btn-sm btn-success float-right mt-3 addNewItem"><i class="fas fa-plus mr-2"></i>Add Item</button>
+                                                                                </div>
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+
+                                                            </div>
+                                                        </div>
+                                                        <div class="container-fluid">
+                                                            <div class="row">
+                                                                <div class="col-md-12">
+                                                                    <table class="table invoiceTable text-center">
+                                                                        <thead class="invTabHead">
+                                                                            <tr>
+                                                                                <th scope="col">Item Type</th>
+                                                                                <th scope="col">Description</th>
+                                                                                <th scope="col">Quantity</th>
+                                                                                <th scope="col">Unit Price</th>
+                                                                                <th scope="col">Amount</th>
+                                                                                <th scope="col"></th>
+                                                                            </tr>
+                                                                        </thead>
+                                                                        <tbody class="invTabBody"></tbody>
+                                                                    </table>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        <div class="container-fluid">
+                                                            <div class="row mt-5">
+                                                                <div class="col-lg-8 col-md-6">
+                                                                    <div class="row d-flex justify-content-center">
+                                                                        <div class="col-lg-8 col-md-12">
+                                                                            <div class="form-group">
+                                                                                <label for="comments">Comments &amp; Details:</label>
+                                                                                <textarea class="form-control form-control-sm comments" rows="4"></textarea>
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                                <div class="col-lg-4 col-md-6">
+                                                                    <div class="form-group">
+                                                                        <label for="subtotal">Subtotal</label>
+                                                                        <div class="input-group">
+                                                                            <div class="input-group-prepend">
+                                                                                <span class="input-group-text"><i class="fas fa-dollar-sign"></i></span>
+                                                                            </div>
+                                                                            <input type="number" class="form-control form-control-sm subtotal" disabled>
+                                                                        </div>
+                                                                    </div>
+                                                                    <div class="form-group">
+                                                                        <label for="taxRate">Tax Rate:</label>
+                                                                        <div class="input-group">
+                                                                            <input type="number" class="form-control form-control-sm taxRate">
+                                                                            <div class="input-group-append">
+                                                                                <span class="input-group-text"><i class="fas fa-percent"></i></span>
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
+                                                                    <div class="form-group">
+                                                                        <label for="taxAmount">Tax Amount:</label>
+                                                                        <div class="input-group">
+                                                                            <div class="input-group-prepend">
+                                                                                <span class="input-group-text"><i class="fas fa-dollar-sign"></i></span>
+                                                                            </div>
+                                                                            <input type="number" class="form-control form-control-sm taxAmount" disabled>
+                                                                        </div>
+                                                                    </div>
+                                                                    <div class="form-group">
+                                                                        <label for="payments">Payments:</label>
+                                                                        <div class="input-group">
+                                                                            <div class="input-group-prepend">
+                                                                                <span class="input-group-text text-danger">-<i class="fas fa-dollar-sign"></i></span>
+                                                                            </div>
+                                                                            <input type="number" class="form-control form-control-sm payments">
+                                                                        </div>
+                                                                    </div>
+                                                                    <div class="form-group">
+                                                                        <label for="amountDue">Amount Due:</label>
+                                                                        <div class="input-group">
+                                                                            <div class="input-group-prepend">
+                                                                                <span class="input-group-text"><i class="fas fa-dollar-sign"></i></span>
+                                                                            </div>
+                                                                            <input type="number" class="form-control form-control-sm amountDue" disabled>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        <div class="container-fluid">
+                                                            <div class="row">
+                                                                <button type="button" class="btn btn-sm btn-primary ml-5 mb-5 saveInvoice"><i class="far fa-save mr-2"></i>Save Invoice</button>
+                                                                <button type="button" class="btn btn-sm btn-warning ml-5 mb-5 updateInvoice" style="display: none;"><i class="far fa-save mr-2"></i>Update Invoice</button>
+                                                                <div id="parentAlert1" class="ml-5">
+                                                                    <div id="childAlert1"></div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+
+                    </div>
+
+                </div>
+            </div>
+        </div>
+        <!-- Modal - Add Vendors -->
+        <div class="modal fade" id="addVendorModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="exampleModalLongTitle">Add Vendor</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                      <span aria-hidden="true">&times;</span>
+                    </button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="form-group">
+                            <label for="vendorName">Vendor Name:</label>
+                            <input type="text" class="form-control form-control-sm vendorNameMod">
+                        </div>
+                        <div class="form-group">
+                            <label for="vendorAddress">Address:</label>
+                            <input type="text" class="form-control form-control-sm vendorAddressMod">
+                        </div>
+                        <div class="form-group">
+                            <label for="vendorCity">City:</label>
+                            <input type="text" class="form-control form-control-sm vendorCityMod">
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="vendorState">State:</label>
+                                    <select class="form-control vendorStateMod states">
+                              </select>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="vendorZip">Zip code:</label>
+                                    <input type="number" class="form-control form-control-sm vendorZipMod">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-sm btn-secondary" data-dismiss="modal">Close</button>
+                        <button type="button" class="btn btn-sm btn-primary saveVendor" data-dismiss="modal">Save changes</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- Modal - Add Sales Person -->
+        <div class="modal fade" id="salesPersonModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="exampleModalLongTitle">Add Sales Person</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                      <span aria-hidden="true">&times;</span>
+                    </button>
+                    </div>
+                    <div class="modal-body">
+                        ...
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-sm btn-secondary" data-dismiss="modal">Close</button>
+                        <button type="button" class="btn btn-sm btn-primary saveSalesPerson" data-dismiss="modal">Save changes</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- Modal - Add Item Type -->
+        <div class="modal fade" id="itemTypeModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="exampleModalLongTitle">Add Sales Person</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                      <span aria-hidden="true">&times;</span>
+                    </button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="form-group">
+                            <label for="itemType">Item Type:</label>
+                            <input type="text" class="form-control form-control-sm itemType">
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-sm btn-secondary" data-dismiss="modal">Close</button>
+                        <button type="button" class="btn btn-sm btn-primary saveItemType" data-dismiss="modal">Save changes</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script src="assets/js/jquery-3.3.1.min.js"></script>
+    <script src="assets/js/gijgo.min.js"></script>
+    <script src="assets/js/popper.min.js"></script>
+    <script src="assets/js/bootstrap.min.js"></script>
+    <script src="assets/js/dropzone.js"></script>
+    
+    <script src="build/invoicing.bundle.js"></script>
+    
+
+</body>
+
+</html>

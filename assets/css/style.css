@@ -1,0 +1,51 @@
+hr {
+    height: 1px;
+    width: 90%;
+}
+
+/*
+.description {
+    height: 3rem;
+}
+
+.quantity {
+    padding: 0.7rem .75rem;
+}
+
+.unitPrice {
+    padding: 0.7rem .75rem;
+}
+
+.itemAmount {
+    padding: 0.7rem .75rem;
+}
+*/
+
+div#invoiceCard {
+    box-shadow: 1px 1px 17px 0px #0000003b;
+}
+
+#logoDropZone{
+    border: 1px dashed #000000;
+    border-radius: 1rem;
+    cursor: pointer;
+}
+
+#paidStamp{
+    width: 75%;
+    display: none;
+}
+
+#pastDueStamp{
+    width: 75%;
+    display: none;
+    transform: rotate(30deg);
+}
+
+
+.gj-datepicker-bootstrap [role=right-icon] button .gj-icon, .gj-datepicker-bootstrap [role=right-icon] button .material-icons {
+    position: absolute;
+    font-size: 21px;
+    top: 6px;
+    left: 9px;
+}
