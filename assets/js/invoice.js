@@ -138,7 +138,7 @@ const StorageCtrl = (function(){
                 }    
             });
             localStorage.setItem(key, JSON.stringify(retrievedData));
-            console.log(retrievedData);
+
         },
         getGenericFromStorage: function(item){
             let genericItems;
@@ -258,7 +258,7 @@ const ItemCtrl = (function(){
         addBusiness: (businessInputs)=>{
             let newBusiness,
                 id = 0;
-
+            
             //Instantiate a new bussiness object
             newBusiness = new Business(id, businessInputs.businessName, businessInputs.businessAddress, businessInputs.businessCity, businessInputs.businessState, businessInputs.businessZip);
             
@@ -267,7 +267,10 @@ const ItemCtrl = (function(){
         },
         addItems: (itemInputs)=> {
             let newItem,
-                ID;
+                ID,
+                quantity,
+                unitprice,
+                itemAmount;
             
             //Add auto-increment id
             if(invoiceData.invoiceItems.length > 0){
@@ -276,7 +279,13 @@ const ItemCtrl = (function(){
                 ID = 0;
             }
             
-            newItem = new InvoiceItem(ID, itemInputs.itemType, itemInputs.description, itemInputs.quantity, itemInputs.unitPrice, parseFloat(itemInputs.itemAmount));
+            quantity = parseInt(itemInputs.quantity);
+            unitprice = parseFloat(itemInputs.unitPrice);
+            itemAmount = parseFloat(itemInputs.itemAmount);
+            
+            
+            
+            newItem = new InvoiceItem(ID, itemInputs.itemType, itemInputs.description, quantity, unitprice, itemAmount);
             
             invoiceData.invoiceItems.push(newItem);
             
@@ -337,7 +346,7 @@ const ItemCtrl = (function(){
                     subtotal += item.itemAmount;
                 });
             }
-            return subtotal.toFixed(2);
+            return subtotal;
         },
         updateInvoiceStatus:(retrievedData)=> {
             let currentTime = new Date().getTime();
@@ -347,6 +356,17 @@ const ItemCtrl = (function(){
 
                 }
             });   
+        },
+        updateInvoiceItem:(itemID, newInput)=>{
+            invoiceData.invoiceItems.forEach(item=>{
+                if(item.id === itemID){
+                    item.itemAmount = newInput.itemAmount;
+                    item.itemDescription = newInput.itemDescription;
+                    item.itemQuantity = newInput.itemQuantity;
+                    item.itemType = newInput.itemType;
+                    item.itemUnitPrice = newInput.itemUnitPrice;
+                }    
+            });      
         },
         getUSStates:()=>{
             return usStates;     
@@ -520,6 +540,7 @@ const UICtrl = (function($){
             document.querySelector(UISelectors.businessZip).value = businessData.businessZip
         },
         displayFoundItems:(retrievedItem)=>{
+            console.log(retrievedItem);
             document.querySelector(UISelectors.invItemId).value = retrievedItem.id;
             document.querySelector(UISelectors.itemType).value = retrievedItem.itemType;
             document.querySelector(UISelectors.description).value = retrievedItem.itemDescription;
@@ -732,6 +753,11 @@ const StateCtrl = (function(){
             document.querySelector(UISelectors.updateItem).style.display = 'block';
             document.querySelector(UISelectors.backBtn3).style.display = 'block';
             document.querySelector(UISelectors.addNewItem).style.display = 'none';
+        },
+        displayItemState: ()=>{
+            document.querySelector(UISelectors.updateItem).style.display = 'none';
+            document.querySelector(UISelectors.backBtn3).style.display = 'none';
+            document.querySelector(UISelectors.addNewItem).style.display = 'block';
         },
         initBussinessState: ()=> {
             document.querySelector(UISelectors.businessName).disabled = false,
@@ -1068,12 +1094,33 @@ const AppCtrl = (function(StorageCtrl, ItemCtrl, UICtrl, StateCtrl, $){
               key = 'invoices',
               updatedInputs = UICtrl.getItemInputs();
         
-        //Store Update inputs in local storage
-        StorageCtrl.updateInvoiceItem(key, invoiceId, itemId, updatedInputs);
-       
-        //calcAmounts();
+        if(ItemCtrl.retrieveInvoiceItems().length > 0){
+        
+            ItemCtrl.updateInvoiceItem(itemId, updatedInputs);
+            
+        }else{
+        
+            //Store Update inputs in local storage
+            StorageCtrl.updateInvoiceItem(key, invoiceId, itemId, updatedInputs);
+            
+        }
+        
+        
+       //Calculate subtotal
+        const subTotal = ItemCtrl.calcSubtotal();
+
+        //update UI subtotal
+        document.querySelector(UISelectors.subtotal).value = subTotal;
+        
         
         UICtrl.displayUpdatedItem(itemId, updatedInputs);
+        
+        //clear item inputs
+        StateCtrl.clearItemInputs();
+        
+        StateCtrl.displayItemState();
+
+        calcAmounts();
         
         UICtrl.showAlert("Invoice item Updated", 'alert alert-success py-2 d-flex justify-content-center mb-0', '#parentAlert3', '#childAlert3');
     }
@@ -1146,7 +1193,8 @@ const AppCtrl = (function(StorageCtrl, ItemCtrl, UICtrl, StateCtrl, $){
         let parentId,
             itemId,
             invoiceId,
-            key = 'invoices';
+            key = 'invoices',
+            retrievedStorage;
         
         invoiceId = getSelectInvoiceId();
         
@@ -1161,11 +1209,13 @@ const AppCtrl = (function(StorageCtrl, ItemCtrl, UICtrl, StateCtrl, $){
         
         itemId = parseInt(parentId.split('-')[1]);
         
-        console.log(ItemCtrl.retrieveInvoiceItems());
-        
-        //retrieve invoice item from storage
-        const retrievedStorage = StorageCtrl.retrieveInvoiceItems(key, invoiceId, itemId);
-
+        //Retrieve Item data from either local storage or datastructure
+        if(ItemCtrl.retrieveInvoiceItems().length > 0){
+            retrievedStorage = ItemCtrl.retrieveInvoiceItems()[0];    
+        }else {
+            retrievedStorage = StorageCtrl.retrieveInvoiceItems(key, invoiceId, itemId);
+        }
+    
         UICtrl.displayFoundItems(retrievedStorage);
         
         StateCtrl.editItemState();
