@@ -362,9 +362,7 @@ const ItemCtrl = (function(){
             let itemQuantity = parseInt(newInput.quantity),
                 unitPrice = parseFloat(newInput.unitPrice),
                 itemAmount = parseFloat(newInput.itemAmount);
-            
-            console.log(newInput);
-            console.log(itemQuantity, unitPrice, itemAmount);
+
             invoiceData.invoiceItems.forEach(item=>{
                 if(item.id === itemID){
                     item.itemAmount = itemAmount;
@@ -850,6 +848,8 @@ const AppCtrl = (function(StorageCtrl, ItemCtrl, UICtrl, StateCtrl, $){
         //Add Item click
         document.querySelector(UISelectors.addNewItem).addEventListener('click', addItem);
         
+        document.querySelector(UISelectors.backBtn3).addEventListener('click', StateCtrl.displayItemState);
+        
         //back btn click
         document.querySelector(UISelectors.backBtn2).addEventListener('click', StateCtrl.displayBusinessState);
         
@@ -1218,7 +1218,7 @@ const AppCtrl = (function(StorageCtrl, ItemCtrl, UICtrl, StateCtrl, $){
         
         //Retrieve Item data from either local storage or datastructure
         if(ItemCtrl.retrieveInvoiceItems().length > 0){
-            retrievedStorage = ItemCtrl.retrieveInvoiceItems()[0];    
+            retrievedStorage = ItemCtrl.retrieveInvoiceItems()[itemId];    
         }else {
             retrievedStorage = StorageCtrl.retrieveInvoiceItems(key, invoiceId, itemId);
         }
