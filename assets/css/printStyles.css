@@ -1,0 +1,120 @@
+.card-header.bg-secondary.pt-4 {
+    display: none;
+}
+
+.card-body.bg-light.pt-3.border.border-secondary {
+    padding: 0;
+}
+
+.card.invItemCard {
+    display: none;
+}
+
+input[type="button"]{
+    display: none!important;
+}
+
+.updateInvoice{
+    display: none!important;
+}
+
+input {
+    outline: none;
+    border-width: 0!important;
+}
+
+select {
+    outline: none;
+    border-width: 0!important;
+}
+
+.btn {
+    display: none;
+}
+
+.input-group-text{
+    border: 0;
+}
+
+.editBusiness {
+    display: none!important;
+}
+
+div#mainCard {
+    margin: 0!important;
+    border: 0!important;
+}
+
+.col-md-12 {
+    padding: 0;
+}
+
+.border-secondary {
+    border-color: #ffffff!important;
+    border: 0!important;
+}
+
+.border {
+    border: 0!important;
+}
+
+div#invoiceCard {
+    box-shadow: 0;
+}
+
+.vendorsSelect{
+    display: none;
+}
+
+div#invTotals {
+    max-width: 15%!important;
+    margin-left: 20rem;
+}
+
+table.table.invoiceTable.text-center {
+    margin-top: 5rem;
+    margin-bottom: 3rem;
+}
+
+label {
+    margin-bottom: 0;
+    border-bottom: 1px solid #0000004a;
+    font-weight: bold;
+}
+
+.taxRate {
+    text-align: right;
+}
+.subtotal {
+    text-align: center;
+}
+.taxAmount {
+    text-align: center;
+}
+.payments {
+    text-align: center;
+}
+
+.amountDue {
+    text-align: center;
+}
+
+h1.display-4.font-weight-bold {
+    margin-bottom: 7rem;
+}
+
+.fromCard {
+    margin-top: 7rem!important;
+}
+
+.toCard {
+    margin-top: 7rem!important;
+}
+
+.bg-secondary {
+    background-color: #FFFFFF!important;
+}
+
+.salesPersonSelect{
+    display: none!important;
+}

@@ -3,23 +3,6 @@ hr {
     width: 90%;
 }
 
-/*
-.description {
-    height: 3rem;
-}
-
-.quantity {
-    padding: 0.7rem .75rem;
-}
-
-.unitPrice {
-    padding: 0.7rem .75rem;
-}
-
-.itemAmount {
-    padding: 0.7rem .75rem;
-}
-*/
 
 div#invoiceCard {
     box-shadow: 1px 1px 17px 0px #0000003b;
