@@ -9637,8 +9637,8 @@ const UICtrl = (function($){
             }   
         },
         getItemInputs: () =>{
-            const selectBox = document.querySelector(UISelectors.itemType);
-            const selectIndex = selectBox.options[selectBox.selectedIndex].text;
+            const selectBox = document.querySelector(UISelectors.itemTypeSelect);
+            const selectIndex = selectBox.options[selectBox.selectedIndex].value;
 
             return {
                 itemType: selectIndex,
@@ -9700,7 +9700,7 @@ const UICtrl = (function($){
             employeeData.forEach(emp=>{
                 let option = document.createElement('option');
                 option.text = emp.employeeInput;
-                option.vlaue = emp.employeeId;
+                option.value = emp.employeeId;
                 document.querySelector(selector).appendChild(option);
             });
         },
@@ -9709,7 +9709,7 @@ const UICtrl = (function($){
             data.forEach(datum=>{
                 let option = document.createElement('option');
                 option.text = datum.itemInput;
-                option.vlaue = datum.itemId;
+                option.value = datum.itemId;
                 document.querySelector(selector).appendChild(option);
             });
         },
@@ -9778,8 +9778,8 @@ const UICtrl = (function($){
                         <td class="align-middle">${x.itemQuantity}</td>
                         <td class="align-middle">&dollar;${x.itemUnitPrice}</td>
                         <td class="align-middle">&dollar;${x.itemAmount}</td>
-                        <td class="modifytd align-middle"><button class="btn btn-warning editInvoiceItem mr-2" type="button"><i class="far fa-edit h3 mb-0"> </i></button>
-                        <button class="btn btn-danger deleteInvoiceItem" type="button"><i class="far fa-trash-alt h3 mb-0"></i></button></td>
+                        <td class="modifytd align-middle"><button class="btn btn-warning editInvoiceItem mr-2" type="button"><i class="far fa-edit h5 mb-0"> </i></button>
+                        <button class="btn btn-danger deleteInvoiceItem" type="button"><i class="far fa-trash-alt h5 mb-0"></i></button></td>
                         </tr>`;    
                 });
 
@@ -9799,8 +9799,8 @@ const UICtrl = (function($){
                             <td class="align-middle">${newItem.itemQuantity}</td>
                             <td class="align-middle">&dollar;${newItem.itemUnitPrice}</td>
                             <td class="align-middle">&dollar;${newItem.itemAmount}</td>
-                            <td class="modifytd align-middle"><button class="btn btn-warning editInvoiceItem mr-2" type="button"><i class="far fa-edit h3 mb-0"> </i></button>
-                            <button class="btn btn-danger deleteInvoiceItem" type="button"><i class="far fa-trash-alt h3 mb-0"></i></button></td>`;
+                            <td class="modifytd align-middle"><button class="btn btn-warning editInvoiceItem mr-2" type="button"><i class="far fa-edit h5 mb-0"> </i></button>
+                            <button class="btn btn-danger deleteInvoiceItem" type="button"><i class="far fa-trash-alt h5 mb-0"></i></button></td>`;
             
             //Insert item
             document.querySelector(UISelectors.invTabBody).insertAdjacentElement('beforeend', tr);
@@ -9821,8 +9821,8 @@ const UICtrl = (function($){
                                 <td class="align-middle">${updatedItem.quantity}</td>
                                 <td class="align-middle">&dollar;${updatedItem.unitPrice}</td>
                                 <td class="align-middle">&dollar;${updatedItem.itemAmount}</td>
-                                <td class="modifytd align-middle"><button class="btn btn-warning editInvoiceItem mr-2" type="button"><i class="far fa-edit h3 mb-0"> </i></button>
-                                <button class="btn btn-danger deleteInvoiceItem" type="button"><i class="far fa-trash-alt h3 mb-0"></i></button></td>`;
+                                <td class="modifytd align-middle"><button class="btn btn-warning editInvoiceItem mr-2" type="button"><i class="far fa-edit h5 mb-0"> </i></button>
+                                <button class="btn btn-danger deleteInvoiceItem" type="button"><i class="far fa-trash-alt h5 mb-0"></i></button></td>`;
                 }
             }) 
         },
@@ -10018,6 +10018,11 @@ const AppCtrl = (function(StorageCtrl, ItemCtrl, UICtrl, StateCtrl, $){
         
         //back btn click
         document.querySelector(UISelectors.backBtn).addEventListener('click', StateCtrl.displayVendorState);
+        
+        //print button click
+        document.querySelector('.printInvoice').addEventListener('click', ()=>{
+            window.print();
+        });
         
         //New Invoice click
         document.querySelector(UISelectors.newInvoice).addEventListener('click', newInvoice);
