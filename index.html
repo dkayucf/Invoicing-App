@@ -10,7 +10,8 @@
 <script src="assets/js/fontawesome-all.min.js"></script>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/gijgo/1.9.4/combined/css/gijgo.min.css">
 <link rel="stylesheet" href="assets/css/bootstrap.min.css">
-<link rel="stylesheet" href="assets/css/style.css">
+<link rel="stylesheet" href="assets/css/style.css" media="screen">
+<link rel="stylesheet" href="assets/css/printStyles.css" media="print">
 
 <body>
     <div class="container-fluid">
@@ -59,14 +60,14 @@
                                         <div class="card-body">
                                             <div class="container-fluid">
                                                 <div class="row d-flex justify-content-between">
-                                                    <div class="col-lg-3 col-md-5 mb-3">
+                                                    <div class="col-lg-3 col-md-4 mb-3">
                                                         <form action="/file-upload" class="dropzone p-5 text-center" id="logoDropZone">
                                                             <div class="fallback">
                                                                 <input name="file" type="file" multiple />
                                                             </div>
                                                         </form>
                                                     </div>
-                                                    <div class="col-lg-6 col-md-6 d-flex flex-column justify-content-center">
+                                                    <div class="col-lg-5 col-md-8 d-flex flex-column justify-content-center">
                                                         <div class="input-group  input-group-sm mb-3">
                                                             <div class="input-group-prepend">
                                                                 <button class="btn btn-sm btn-danger deletePerson" type="button"><i class="far fa-trash-alt"></i></button>
@@ -126,7 +127,7 @@
                                                             </div>
                                                         </div>
                                                     </div>
-                                                    <div class="col-lg-4 col-md-4 mt-4">
+                                                    <div class="col-lg-4 col-md-4 mt-4 fromCard">
                                                         <div class="card">
                                                             <div class="card-header d-inline-flex">
                                                                 <h4 class="mr-auto">From</h4>
@@ -165,7 +166,7 @@
                                                             </div>
                                                         </div>
                                                     </div>
-                                                    <div class="col-lg-4 col-md-4 mt-4">
+                                                    <div class="col-lg-4 col-md-4 mt-4 toCard">
                                                         <div class="card">
                                                             <div class="card-header d-inline-flex">
                                                                 <h4 class="mr-auto">To</h4>
@@ -208,7 +209,7 @@
                                             <div class="container-fluid">
                                                 <div class="row">
                                                     <div class="col-md-12 mt-3">
-                                                        <div class="card">
+                                                        <div class="card invItemCard">
                                                             <div class="card-body">
                                                                 <div class="container-fluid">
                                                                     <div class="row">
@@ -315,7 +316,7 @@
                                                                         </div>
                                                                     </div>
                                                                 </div>
-                                                                <div class="col-lg-4 col-md-6">
+                                                                <div class="col-lg-4 col-md-6" id="invTotals">
                                                                     <div class="form-group">
                                                                         <label for="subtotal">Subtotal</label>
                                                                         <div class="input-group">
