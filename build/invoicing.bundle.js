@@ -9085,6 +9085,84 @@ const StorageCtrl = (function(){
         storeBusiness: function(newBusiness){
             localStorage.setItem('business', JSON.stringify(newBusiness));
         },
+        storeEmployee: function(key, employeeInput){
+            const Employee = function(employeeId, employeeInput){
+                this.employeeId = employeeId;
+                this.employeeInput = employeeInput;
+            }
+            
+            let newEmployee,
+                employees,
+                employeeId;
+            
+            if(localStorage.getItem(key) === null){
+                employees = [];
+                employeeId = 0;
+                
+                newEmployee = new Employee(employeeId, employeeInput);
+                
+                employees.push(newEmployee);
+                
+                localStorage.setItem(key, JSON.stringify(employees));
+            }else {
+                
+                employees = JSON.parse(localStorage.getItem(key));
+                
+                if(employees.length > 0){
+                    employeeId = employees[employees.length - 1].employeeId + 1;
+
+                    //Instantiate a new invoice object
+                    newEmployee = new Employee(employeeId, employeeInput);
+
+                    //Push new invoice item
+                    employees.push(newEmployee); 
+
+                    //Re-Set Local Storage
+                    localStorage.setItem(key, JSON.stringify(employees));    
+                }
+                
+                
+            }
+        },
+        storeItemType: function(key, itemInput){
+            let newItem,
+                items,
+                itemId;
+                   
+            const Item = function(itemId, itemInput){
+                this.itemId = itemId;
+                this.itemInput = itemInput;
+            }
+
+            if(localStorage.getItem(key) === null){
+                items = [];
+                itemId = 0;
+                
+                newItem = new Item(itemId, itemInput);
+                
+                items.push(newItem);
+                
+                localStorage.setItem(key, JSON.stringify(items));
+            }else {
+                
+                items = JSON.parse(localStorage.getItem(key));
+                
+                if(items.length > 0){
+                    itemId = items[items.length - 1].itemId + 1;
+
+                    //Instantiate a new Item object
+                    newItem = new Item(itemId, itemInput);
+
+                    //Push new new item
+                    items.push(newItem); 
+
+                    //Re-Set Local Storage
+                    localStorage.setItem(key, JSON.stringify(items));    
+                }
+                
+                
+            }
+        },
         //Store Invoices in local storage
         storeInvoice: function (newInvoiceData) {            
 
@@ -9167,7 +9245,33 @@ const StorageCtrl = (function(){
                 }    
             });
             localStorage.setItem(key, JSON.stringify(retrievedData));
-            console.log(retrievedData);
+
+        },
+        updateInvoice: function(key, selectedInvoiceId, retrieveItems, vendorInputs, businessInputs, invoiceInfo){
+            let retrieveStorage = StorageCtrl.getGenericFromStorage(key);
+            console.log(retrieveItems);
+            retrieveStorage.forEach(item=>{
+               if(item.invoiceID === selectedInvoiceId){
+                   let oldData = item.invoiceData;
+                   
+                   oldData.amountDue = invoiceInfo.amountDue;
+                   oldData.businessFrom = businessInputs;
+                   oldData.comments = invoiceInfo.comments;
+                   oldData.dueDate = invoiceInfo.dueDate;
+                   oldData.invoiceId = invoiceInfo.invoiceID;
+                   oldData.invoiceItems = retrieveItems;
+                   oldData.issueDate = invoiceInfo.issueDate;
+                   oldData.payments = invoiceInfo.payments;
+                   oldData.salesPerson = invoiceInfo.salesPerson;
+                   oldData.subject = invoiceInfo.subject;
+                   oldData.subtotal = invoiceInfo.subtotal;
+                   oldData.taxAmount = invoiceInfo.taxAmount;
+                   oldData.taxRate = invoiceInfo.taxRate;
+                   oldData.vendorTo = [vendorInputs];
+               } 
+            });
+            localStorage.setItem(key, JSON.stringify(retrieveStorage));
+            
         },
         getGenericFromStorage: function(item){
             let genericItems;
@@ -9239,7 +9343,7 @@ const ItemCtrl = (function(){
         dueDate: null,
         subject: null,
         invoiceItems: [],
-        bussinessFrom: [],
+        businessFrom: [],
         vendorTo: [],
         comments: null,
         subtotal: null,
@@ -9264,7 +9368,7 @@ const ItemCtrl = (function(){
             invoiceData.dueDate = null;
             invoiceData.subject = null;
             invoiceData.invoiceItems = [];
-            invoiceData.bussinessFrom = [];
+            invoiceData.businessFrom = [];
             invoiceData.vendorTo = [];
             invoiceData.comments = null;
             invoiceData.subtotal = null;
@@ -9287,16 +9391,19 @@ const ItemCtrl = (function(){
         addBusiness: (businessInputs)=>{
             let newBusiness,
                 id = 0;
-
-            //Instantiate a new bussiness object
+            
+            //Instantiate a new business object
             newBusiness = new Business(id, businessInputs.businessName, businessInputs.businessAddress, businessInputs.businessCity, businessInputs.businessState, businessInputs.businessZip);
             
-            //Add new bussiness to storage
+            //Add new business to storage
             StorageCtrl.storeBusiness(newBusiness);
         },
         addItems: (itemInputs)=> {
             let newItem,
-                ID;
+                ID,
+                quantity,
+                unitprice,
+                itemAmount;
             
             //Add auto-increment id
             if(invoiceData.invoiceItems.length > 0){
@@ -9305,7 +9412,13 @@ const ItemCtrl = (function(){
                 ID = 0;
             }
             
-            newItem = new InvoiceItem(ID, itemInputs.itemType, itemInputs.description, itemInputs.quantity, itemInputs.unitPrice, parseFloat(itemInputs.itemAmount));
+            quantity = parseInt(itemInputs.quantity);
+            unitprice = parseFloat(itemInputs.unitPrice);
+            itemAmount = parseFloat(itemInputs.itemAmount);
+            
+            
+            
+            newItem = new InvoiceItem(ID, itemInputs.itemType, itemInputs.description, quantity, unitprice, itemAmount);
             
             invoiceData.invoiceItems.push(newItem);
             
@@ -9320,7 +9433,7 @@ const ItemCtrl = (function(){
             invoiceData.issueDate = invoiceInfo.issueDate;
             invoiceData.dueDate = invoiceInfo.dueDate;
             invoiceData.subject = invoiceInfo.subject;
-            invoiceData.bussinessFrom.push(businessInputs);
+            invoiceData.businessFrom.push(businessInputs);
             invoiceData.vendorTo.push(vendorInputs);
             invoiceData.comments = invoiceInfo.comments;
             invoiceData.subtotal = invoiceInfo.subtotal;
@@ -9340,21 +9453,21 @@ const ItemCtrl = (function(){
         },
         addRetrievedData: (retrievedInvoice)=>{
             let today = new Date().getTime();
-            
+
+            invoiceData.comments = retrievedInvoice.comments;
             invoiceData.salesPerson = retrievedInvoice.salesPerson;
-            invoiceData.invoiceId = retrievedInvoice.invoiceID;
+            invoiceData.invoiceId = retrievedInvoice.invoiceId;
             invoiceData.issueDate = retrievedInvoice.issueDate;
             invoiceData.dueDate = retrievedInvoice.dueDate;
             invoiceData.subject = retrievedInvoice.subject;
             invoiceData.invoiceItems = retrievedInvoice.invoiceItems;
-            invoiceData.bussinessFrom = retrievedInvoice.businessFrom;
+            invoiceData.businessFrom = retrievedInvoice.businessFrom;
             invoiceData.vendorTo = retrievedInvoice.vendorTo;
             invoiceData.subtotal = retrievedInvoice.subtotal;
             invoiceData.taxRate = retrievedInvoice.taxRate;
             invoiceData.taxAmount = retrievedInvoice.taxAmount;
             invoiceData.payments = retrievedInvoice.payments;
             invoiceData.amountDue = retrievedInvoice.amountDue;
-            
             return invoiceData;
         },
         calcSubtotal: ()=>{
@@ -9366,7 +9479,8 @@ const ItemCtrl = (function(){
                     subtotal += item.itemAmount;
                 });
             }
-            return subtotal.toFixed(2);
+
+            return subtotal;
         },
         updateInvoiceStatus:(retrievedData)=> {
             let currentTime = new Date().getTime();
@@ -9376,6 +9490,22 @@ const ItemCtrl = (function(){
 
                 }
             });   
+        },
+        updateInvoiceItem:(itemID, newInput)=>{
+            let itemQuantity = parseInt(newInput.quantity),
+                unitPrice = parseFloat(newInput.unitPrice),
+                itemAmount = parseFloat(newInput.itemAmount);
+
+            invoiceData.invoiceItems.forEach(item=>{
+                if(item.id === itemID){
+                    item.itemAmount = itemAmount;
+                    item.itemDescription = newInput.description;
+                    item.itemQuantity = itemQuantity;
+                    item.itemType = newInput.itemType;
+                    item.itemUnitPrice = unitPrice;
+                }    
+            }); 
+
         },
         getUSStates:()=>{
             return usStates;     
@@ -9407,6 +9537,7 @@ const UICtrl = (function($){
         saveVendor: '.saveVendor',
         saveBusiness: '.saveBusiness',
         saveSalesPerson: '.saveSalesPerson',
+        saveItemType: '.saveItemType',
         pdfView: '.pdfView',
         printInvoice: '.printInvoice',
         backBtn: '#backBtn1',
@@ -9442,7 +9573,9 @@ const UICtrl = (function($){
         taxRate: '.taxRate',
         taxAmount: '.taxAmount',
         payments: '.payments',
-        amountDue: '.amountDue', 
+        amountDue: '.amountDue',
+        salesPersonInput: '.salesPersonInput',
+        itemType: '.itemType',
         
         //Selects
         vendorsSelect: '.vendorsSelect',
@@ -9453,7 +9586,7 @@ const UICtrl = (function($){
         vendorState: '.vendorState',
         vendorStateMod: '.vendorStateMod',
         businessState: '.businessState',
-        itemType: '.itemType',
+        itemTypeSelect: '.itemTypeSelect',
         states: '.states',
         invoiceSelects: '.invoiceSelects',
         
@@ -9466,10 +9599,6 @@ const UICtrl = (function($){
         invTabHead: '.invTabHead',
         invTabBody: '.invTabBody',
         invTabRow: '.invTabBody tr',
-        
-        //Images
-        paidStamp: '#paidStamp',
-        pastDueStamp: '#pastDueStamp',
         
         //Other
         invItemId: '.invItemId'
@@ -9566,10 +9695,28 @@ const UICtrl = (function($){
                         document.querySelector(selector).appendChild(option);
                 });
         },
+        populateEmployeeSelect:(employeeData, selector)=>{
+            $(selector).find('option:gt(0)').remove();
+            employeeData.forEach(emp=>{
+                let option = document.createElement('option');
+                option.text = emp.employeeInput;
+                option.vlaue = emp.employeeId;
+                document.querySelector(selector).appendChild(option);
+            });
+        },
+        populateItemTypeSelect:(data, selector)=>{
+            $(selector).find('option:gt(0)').remove();
+            data.forEach(datum=>{
+                let option = document.createElement('option');
+                option.text = datum.itemInput;
+                option.vlaue = datum.itemId;
+                document.querySelector(selector).appendChild(option);
+            });
+        },
         populateSelects: (invoices)=>{
-//            $(UISelectors.invoicesPaid).find('option:gt(0)').remove();
-//            $(UISelectors.invoicesPastDue).find('option:gt(0)').remove();
-//            $(UISelectors.invoicesDue).find('option:gt(0)').remove();
+            $(UISelectors.invoicesPaid).find('option:gt(0)').remove();
+            $(UISelectors.invoicesPastDue).find('option:gt(0)').remove();
+            $(UISelectors.invoicesDue).find('option:gt(0)').remove();
             
             const invoiceForEach = invoices.forEach(x=> {
                 let vendorName = x.invoiceData.vendorTo[0].vendorName,
@@ -9577,15 +9724,15 @@ const UICtrl = (function($){
                     option = document.createElement("option");
                 if(x.invoiceData.status === 'Paid'){ 
                         
-                        option.text = `Vendor: ${vendorName} Date Due: ${dueDate.getMonth()}/${dueDate.getDate()}/${dueDate.getFullYear()}`;
+                        option.text = `Vendor: ${vendorName},  Date Due: ${dueDate.getMonth()}/${dueDate.getDate()}/${dueDate.getFullYear()}`;
                         option.value = `${x.invoiceID}`;
                         document.querySelector(UISelectors.invoicesPaid).appendChild(option);
                 } else if(x.invoiceData.status === 'Past Due'){
-                        option.text = `Vendor: ${vendorName} Date Due: ${dueDate.getMonth()}/${dueDate.getDate()}/${dueDate.getFullYear()}`;
+                        option.text = `Vendor: ${vendorName},  Date Due: ${dueDate.getMonth()}/${dueDate.getDate()}/${dueDate.getFullYear()}`;
                         option.value = `${x.invoiceID}`;
                         document.querySelector(UISelectors.invoicesPastDue).appendChild(option);
                 } else {
-                        option.text = `Vendor: ${vendorName} Date Due: ${dueDate.getMonth()}/${dueDate.getDate()}/${dueDate.getFullYear()}`;
+                        option.text = `Vendor: ${vendorName},  Date Due: ${dueDate.getMonth()}/${dueDate.getDate()}/${dueDate.getFullYear()}`;
                         option.value = `${x.invoiceID}`;
                         document.querySelector(UISelectors.invoicesDue).appendChild(option);
                 }
@@ -9705,7 +9852,7 @@ const UICtrl = (function($){
         
     }
 
-})();
+})($);
 
 
 //==============STATE CONTROLLER=================
@@ -9762,7 +9909,12 @@ const StateCtrl = (function(){
             document.querySelector(UISelectors.backBtn3).style.display = 'block';
             document.querySelector(UISelectors.addNewItem).style.display = 'none';
         },
-        initBussinessState: ()=> {
+        displayItemState: ()=>{
+            document.querySelector(UISelectors.updateItem).style.display = 'none';
+            document.querySelector(UISelectors.backBtn3).style.display = 'none';
+            document.querySelector(UISelectors.addNewItem).style.display = 'block';
+        },
+        initBusinessState: ()=> {
             document.querySelector(UISelectors.businessName).disabled = false,
             document.querySelector(UISelectors.businessAddress).disabled = false,
             document.querySelector(UISelectors.businessCity).disabled = false,
@@ -9822,11 +9974,17 @@ const AppCtrl = (function(StorageCtrl, ItemCtrl, UICtrl, StateCtrl, $){
         //Save Vendor
         document.querySelector(UISelectors.saveVendor).addEventListener('click', saveVendor);
         
+        //Save Sales Person
+        document.querySelector(UISelectors.saveSalesPerson).addEventListener('click', saveSalesPerson);
+        
         //Save Business
         document.querySelector(UISelectors.saveBusiness).addEventListener('click', saveBusiness);
         
         //Save Invoice
         document.querySelector(UISelectors.saveInvoice).addEventListener('click', saveInvoice);
+        
+        //Save Item Type
+        document.querySelector(UISelectors.saveItemType).addEventListener('click', saveItemType);
         
         //Update Vendor click
         document.querySelector(UISelectors.updateVendor).addEventListener('click', updateVendor);
@@ -9843,8 +10001,17 @@ const AppCtrl = (function(StorageCtrl, ItemCtrl, UICtrl, StateCtrl, $){
         //Edit item click
         document.querySelector(UISelectors.invTabBody).addEventListener('click', editInvoiceItem);
         
+        //Update Invoice Click
+        document.querySelector(UISelectors.updateInvoice).addEventListener('click', updateInvoice);
+        
         //Add Item click
         document.querySelector(UISelectors.addNewItem).addEventListener('click', addItem);
+        
+        document.querySelector(UISelectors.backBtn3).addEventListener('click', ()=>{
+            StateCtrl.displayItemState();
+            StateCtrl.clearItemInputs();
+            
+        });
         
         //back btn click
         document.querySelector(UISelectors.backBtn2).addEventListener('click', StateCtrl.displayBusinessState);
@@ -9897,8 +10064,7 @@ const AppCtrl = (function(StorageCtrl, ItemCtrl, UICtrl, StateCtrl, $){
 
         UICtrl.populateStateSelects();
         document.querySelector(UISelectors.comments).value = '';
-        document.querySelector(UISelectors.pastDueStamp).style.display = 'none';
-        document.querySelector(UISelectors.paidStamp).style.display = 'none';
+
         
     }
     
@@ -9986,10 +10152,29 @@ const AppCtrl = (function(StorageCtrl, ItemCtrl, UICtrl, StateCtrl, $){
         
         UICtrl.showAlert("Invoice Saved", 'alert-success py-2', '#parentAlert1', '#childAlert1');
         
-        setTimeout(function() {
-            newInvoice();
-        }, 3000);
+        newInvoice();
         
+    }
+    
+    const saveSalesPerson = ()=> {
+        let key = 'employee';
+        
+        const employeeInput = document.querySelector(UISelectors.salesPersonInput).value;
+        
+        StorageCtrl.storeEmployee(key, employeeInput);
+        
+        
+        UICtrl.populateEmployeeSelect(StorageCtrl.getGenericFromStorage(key), UISelectors.salesPersonSelect);
+    }
+    
+    const saveItemType = ()=> {
+        let key = 'itemType';
+        
+        const itemTypeInput = document.querySelector(UISelectors.itemType).value;
+        
+        StorageCtrl.storeItemType(key, itemTypeInput);
+        
+        UICtrl.populateItemTypeSelect(StorageCtrl.getGenericFromStorage(key), UISelectors.itemTypeSelect);
     }
     
     const loadBusinessData = ()=>{
@@ -10002,10 +10187,9 @@ const AppCtrl = (function(StorageCtrl, ItemCtrl, UICtrl, StateCtrl, $){
         
             StateCtrl.displayBusinessState();
         }else {
-            StateCtrl.initBussinessState();
+            StateCtrl.initBusinessState();
         }
-        
-        
+
     }
     
     const loadVendorData = ()=>{
@@ -10035,6 +10219,8 @@ const AppCtrl = (function(StorageCtrl, ItemCtrl, UICtrl, StateCtrl, $){
                   selectIndex = selectBox.options[selectBox.selectedIndex].value,
                   retrievedInvoice = retrievedData[selectIndex].invoiceData;
             
+            
+            
             //Populate Inputs
             UICtrl.populateInputs(retrievedInvoice);
             
@@ -10051,17 +10237,6 @@ const AppCtrl = (function(StorageCtrl, ItemCtrl, UICtrl, StateCtrl, $){
             document.querySelector(UISelectors.updateInvoice).style.display = 'block';
             
             calcAmounts();
-            
-            if(retrievedInvoice.status === 'Past Due'){
-                document.querySelector(UISelectors.pastDueStamp).style.display = 'block';
-                document.querySelector(UISelectors.paidStamp).style.display = 'none';
-            }else if(retrievedInvoice.status === 'Paid'){
-                document.querySelector(UISelectors.paidStamp).style.display = 'block';
-                document.querySelector(UISelectors.pastDueStamp).style.display = 'none';
-            }else{
-                document.querySelector(UISelectors.pastDueStamp).style.display = 'none';
-                document.querySelector(UISelectors.paidStamp).style.display = 'none';
-            }
             
         }else {
 
@@ -10097,14 +10272,60 @@ const AppCtrl = (function(StorageCtrl, ItemCtrl, UICtrl, StateCtrl, $){
               key = 'invoices',
               updatedInputs = UICtrl.getItemInputs();
         
-        //Store Update inputs in local storage
-        StorageCtrl.updateInvoiceItem(key, invoiceId, itemId, updatedInputs);
-       
-        //calcAmounts();
+        if(ItemCtrl.retrieveInvoiceItems().length > 0){
+
+            ItemCtrl.updateInvoiceItem(itemId, updatedInputs);
+            
+        }else{
+        
+            //Store Update inputs in local storage
+            StorageCtrl.updateInvoiceItem(key, invoiceId, itemId, updatedInputs);
+            
+        }
+        
+        
+       //Calculate subtotal
+        const subTotal = ItemCtrl.calcSubtotal();
+
+        //update UI subtotal
+        document.querySelector(UISelectors.subtotal).value = subTotal;
+        
         
         UICtrl.displayUpdatedItem(itemId, updatedInputs);
         
+        //clear item inputs
+        StateCtrl.clearItemInputs();
+        
+        StateCtrl.displayItemState();
+
+        calcAmounts();
+        
         UICtrl.showAlert("Invoice item Updated", 'alert alert-success py-2 d-flex justify-content-center mb-0', '#parentAlert3', '#childAlert3');
+    }
+    
+    const updateInvoice = ()=>{
+        let key = 'invoices';
+        const selectedInvoiceId = getSelectInvoiceId();
+        
+        const retrieveItems = ItemCtrl.retrieveInvoiceItems();
+        
+        const vendorInputs = UICtrl.getVendorInputs();
+        //get Business inputs
+        const businessInputs = UICtrl.getBusinessInputs();
+        //get other invoice info
+        const invoiceInfo = UICtrl.getInvoiceInfo();
+        
+        StorageCtrl.updateInvoice(key, selectedInvoiceId, retrieveItems, vendorInputs, businessInputs, invoiceInfo);
+        
+        //Load invoice data to populate select fields
+        loadInvoiceData();
+        
+        UICtrl.showAlert("Invoice Updated", 'alert-success py-2', '#parentAlert1', '#childAlert1');
+        
+        newInvoice();
+        
+        StateCtrl.initBusinessState();
+        
     }
   
     const calcItemAmount = ()=> {
@@ -10175,7 +10396,8 @@ const AppCtrl = (function(StorageCtrl, ItemCtrl, UICtrl, StateCtrl, $){
         let parentId,
             itemId,
             invoiceId,
-            key = 'invoices';
+            key = 'invoices',
+            retrievedStorage;
         
         invoiceId = getSelectInvoiceId();
         
@@ -10190,10 +10412,12 @@ const AppCtrl = (function(StorageCtrl, ItemCtrl, UICtrl, StateCtrl, $){
         
         itemId = parseInt(parentId.split('-')[1]);
         
-        console.log(ItemCtrl.retrieveInvoiceItems());
-        
-        //retrieve invoice item from storage
-        const retrievedStorage = StorageCtrl.retrieveInvoiceItems(key, invoiceId, itemId);
+        //Retrieve Item data from either local storage or datastructure
+        if(ItemCtrl.retrieveInvoiceItems().length > 0){
+            retrievedStorage = ItemCtrl.retrieveInvoiceItems()[itemId];    
+        }else {
+            retrievedStorage = StorageCtrl.retrieveInvoiceItems(key, invoiceId, itemId);
+        }
 
         UICtrl.displayFoundItems(retrievedStorage);
         
@@ -10206,6 +10430,10 @@ const AppCtrl = (function(StorageCtrl, ItemCtrl, UICtrl, StateCtrl, $){
     return {
         init: () => {
             loadEventListeners($);
+            
+            UICtrl.populateItemTypeSelect(StorageCtrl.getGenericFromStorage('itemType'), UISelectors.itemTypeSelect);
+            
+            UICtrl.populateEmployeeSelect(StorageCtrl.getGenericFromStorage('employee'), UISelectors.salesPersonSelect);
             
             UICtrl.populateVendorSelects(StorageCtrl.getGenericFromStorage('vendors'), UISelectors.vendorsSelect);
             
