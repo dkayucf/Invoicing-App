@@ -608,8 +608,8 @@ const UICtrl = (function($){
             }   
         },
         getItemInputs: () =>{
-            const selectBox = document.querySelector(UISelectors.itemType);
-            const selectIndex = selectBox.options[selectBox.selectedIndex].text;
+            const selectBox = document.querySelector(UISelectors.itemTypeSelect);
+            const selectIndex = selectBox.options[selectBox.selectedIndex].value;
 
             return {
                 itemType: selectIndex,
@@ -671,7 +671,7 @@ const UICtrl = (function($){
             employeeData.forEach(emp=>{
                 let option = document.createElement('option');
                 option.text = emp.employeeInput;
-                option.vlaue = emp.employeeId;
+                option.value = emp.employeeId;
                 document.querySelector(selector).appendChild(option);
             });
         },
@@ -680,7 +680,7 @@ const UICtrl = (function($){
             data.forEach(datum=>{
                 let option = document.createElement('option');
                 option.text = datum.itemInput;
-                option.vlaue = datum.itemId;
+                option.value = datum.itemId;
                 document.querySelector(selector).appendChild(option);
             });
         },
