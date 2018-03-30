@@ -56,6 +56,84 @@ const StorageCtrl = (function(){
         storeBusiness: function(newBusiness){
             localStorage.setItem('business', JSON.stringify(newBusiness));
         },
+        storeEmployee: function(key, employeeInput){
+            const Employee = function(employeeId, employeeInput){
+                this.employeeId = employeeId;
+                this.employeeInput = employeeInput;
+            }
+            
+            let newEmployee,
+                employees,
+                employeeId;
+            
+            if(localStorage.getItem(key) === null){
+                employees = [];
+                employeeId = 0;
+                
+                newEmployee = new Employee(employeeId, employeeInput);
+                
+                employees.push(newEmployee);
+                
+                localStorage.setItem(key, JSON.stringify(employees));
+            }else {
+                
+                employees = JSON.parse(localStorage.getItem(key));
+                
+                if(employees.length > 0){
+                    employeeId = employees[employees.length - 1].employeeId + 1;
+
+                    //Instantiate a new invoice object
+                    newEmployee = new Employee(employeeId, employeeInput);
+
+                    //Push new invoice item
+                    employees.push(newEmployee); 
+
+                    //Re-Set Local Storage
+                    localStorage.setItem(key, JSON.stringify(employees));    
+                }
+                
+                
+            }
+        },
+        storeItemType: function(key, itemInput){
+            let newItem,
+                items,
+                itemId;
+                   
+            const Item = function(itemId, itemInput){
+                this.itemId = itemId;
+                this.itemInput = itemInput;
+            }
+
+            if(localStorage.getItem(key) === null){
+                items = [];
+                itemId = 0;
+                
+                newItem = new Item(itemId, itemInput);
+                
+                items.push(newItem);
+                
+                localStorage.setItem(key, JSON.stringify(items));
+            }else {
+                
+                items = JSON.parse(localStorage.getItem(key));
+                
+                if(items.length > 0){
+                    itemId = items[items.length - 1].itemId + 1;
+
+                    //Instantiate a new Item object
+                    newItem = new Item(itemId, itemInput);
+
+                    //Push new new item
+                    items.push(newItem); 
+
+                    //Re-Set Local Storage
+                    localStorage.setItem(key, JSON.stringify(items));    
+                }
+                
+                
+            }
+        },
         //Store Invoices in local storage
         storeInvoice: function (newInvoiceData) {            
 
@@ -163,7 +241,6 @@ const StorageCtrl = (function(){
                    oldData.vendorTo = [vendorInputs];
                } 
             });
-            console.log(retrieveStorage);
             localStorage.setItem(key, JSON.stringify(retrieveStorage));
             
         },
@@ -431,6 +508,7 @@ const UICtrl = (function($){
         saveVendor: '.saveVendor',
         saveBusiness: '.saveBusiness',
         saveSalesPerson: '.saveSalesPerson',
+        saveItemType: '.saveItemType',
         pdfView: '.pdfView',
         printInvoice: '.printInvoice',
         backBtn: '#backBtn1',
@@ -466,7 +544,9 @@ const UICtrl = (function($){
         taxRate: '.taxRate',
         taxAmount: '.taxAmount',
         payments: '.payments',
-        amountDue: '.amountDue', 
+        amountDue: '.amountDue',
+        salesPersonInput: '.salesPersonInput',
+        itemType: '.itemType',
         
         //Selects
         vendorsSelect: '.vendorsSelect',
@@ -477,7 +557,7 @@ const UICtrl = (function($){
         vendorState: '.vendorState',
         vendorStateMod: '.vendorStateMod',
         businessState: '.businessState',
-        itemType: '.itemType',
+        itemTypeSelect: '.itemTypeSelect',
         states: '.states',
         invoiceSelects: '.invoiceSelects',
         
@@ -585,6 +665,24 @@ const UICtrl = (function($){
                         option.value = index;
                         document.querySelector(selector).appendChild(option);
                 });
+        },
+        populateEmployeeSelect:(employeeData, selector)=>{
+            $(selector).find('option:gt(0)').remove();
+            employeeData.forEach(emp=>{
+                let option = document.createElement('option');
+                option.text = emp.employeeInput;
+                option.vlaue = emp.employeeId;
+                document.querySelector(selector).appendChild(option);
+            });
+        },
+        populateItemTypeSelect:(data, selector)=>{
+            $(selector).find('option:gt(0)').remove();
+            data.forEach(datum=>{
+                let option = document.createElement('option');
+                option.text = datum.itemInput;
+                option.vlaue = datum.itemId;
+                document.querySelector(selector).appendChild(option);
+            });
         },
         populateSelects: (invoices)=>{
             $(UISelectors.invoicesPaid).find('option:gt(0)').remove();
@@ -847,11 +945,17 @@ const AppCtrl = (function(StorageCtrl, ItemCtrl, UICtrl, StateCtrl, $){
         //Save Vendor
         document.querySelector(UISelectors.saveVendor).addEventListener('click', saveVendor);
         
+        //Save Sales Person
+        document.querySelector(UISelectors.saveSalesPerson).addEventListener('click', saveSalesPerson);
+        
         //Save Business
         document.querySelector(UISelectors.saveBusiness).addEventListener('click', saveBusiness);
         
         //Save Invoice
         document.querySelector(UISelectors.saveInvoice).addEventListener('click', saveInvoice);
+        
+        //Save Item Type
+        document.querySelector(UISelectors.saveItemType).addEventListener('click', saveItemType);
         
         //Update Vendor click
         document.querySelector(UISelectors.updateVendor).addEventListener('click', updateVendor);
@@ -1023,6 +1127,27 @@ const AppCtrl = (function(StorageCtrl, ItemCtrl, UICtrl, StateCtrl, $){
         
     }
     
+    const saveSalesPerson = ()=> {
+        let key = 'employee';
+        
+        const employeeInput = document.querySelector(UISelectors.salesPersonInput).value;
+        
+        StorageCtrl.storeEmployee(key, employeeInput);
+        
+        
+        UICtrl.populateEmployeeSelect(StorageCtrl.getGenericFromStorage(key), UISelectors.salesPersonSelect);
+    }
+    
+    const saveItemType = ()=> {
+        let key = 'itemType';
+        
+        const itemTypeInput = document.querySelector(UISelectors.itemType).value;
+        
+        StorageCtrl.storeItemType(key, itemTypeInput);
+        
+        UICtrl.populateItemTypeSelect(StorageCtrl.getGenericFromStorage(key), UISelectors.itemTypeSelect);
+    }
+    
     const loadBusinessData = ()=>{
         let business = 'business';
         
@@ -1035,8 +1160,7 @@ const AppCtrl = (function(StorageCtrl, ItemCtrl, UICtrl, StateCtrl, $){
         }else {
             StateCtrl.initBusinessState();
         }
-        
-        
+
     }
     
     const loadVendorData = ()=>{
@@ -1277,6 +1401,10 @@ const AppCtrl = (function(StorageCtrl, ItemCtrl, UICtrl, StateCtrl, $){
     return {
         init: () => {
             loadEventListeners($);
+            
+            UICtrl.populateItemTypeSelect(StorageCtrl.getGenericFromStorage('itemType'), UISelectors.itemTypeSelect);
+            
+            UICtrl.populateEmployeeSelect(StorageCtrl.getGenericFromStorage('employee'), UISelectors.salesPersonSelect);
             
             UICtrl.populateVendorSelects(StorageCtrl.getGenericFromStorage('vendors'), UISelectors.vendorsSelect);
             

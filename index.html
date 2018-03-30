@@ -73,9 +73,6 @@
                                                             </div>
                                                             <select class="custom-select form-control   salesPersonSelect">
                                                                 <option selected>Sales Person...</option>
-                                                                <option value="1">One</option>
-                                                                <option value="2">Two</option>
-                                                                <option value="3">Three</option>
                                                             </select>
                                                             <div class="input-group-append">
                                                                 <button class="btn btn-sm btn-primary addSalesPerson" type="button" data-toggle="modal" data-target="#salesPersonModal"><i class="fas fa-plus mr-2"></i>Add Sales Person</button>
@@ -220,11 +217,8 @@
                                                                             <div class="form-group">
                                                                                 <label for="itemType">Item Type:</label>
                                                                                 <div class="input-group input-group-sm">
-                                                                                    <select class="custom-select form-control  itemType">
+                                                                                    <select class="custom-select form-control  itemTypeSelect">
                                                                                         <option selected>Select Item Type...</option>
-                                                                                        <option value="One">One</option>
-                                                                                        <option value="Two">Two</option>
-                                                                                        <option value="Three">Three</option>
                                                                                     </select>
                                                                                     <div class="input-group-append">
                                                                                         <button class="btn btn-sm btn-primary addItemType" type="button" data-toggle="modal" data-target="#itemTypeModal"><i class="fas fa-plus"></i></button>
@@ -453,7 +447,10 @@
                     </button>
                     </div>
                     <div class="modal-body">
-                        ...
+                        <div class="form-group">
+                            <label for="itemType">Employee Name:</label>
+                            <input type="text" class="form-control form-control-sm salesPersonInput">
+                        </div>
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-sm btn-secondary" data-dismiss="modal">Close</button>
