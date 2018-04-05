@@ -3,6 +3,7 @@ $('.issueDate').datepicker({
 });
 $('.dueDate').datepicker({
     uiLibrary: 'bootstrap4'
+
 });
 
 //==============STORAGE CONTROLLER=================
@@ -220,7 +221,7 @@ const StorageCtrl = (function(){
         },
         updateInvoice: function(key, selectedInvoiceId, retrieveItems, vendorInputs, businessInputs, invoiceInfo){
             let retrieveStorage = StorageCtrl.getGenericFromStorage(key);
-            console.log(retrieveItems);
+
             retrieveStorage.forEach(item=>{
                if(item.invoiceID === selectedInvoiceId){
                    let oldData = item.invoiceData;
@@ -455,10 +456,12 @@ const ItemCtrl = (function(){
         },
         updateInvoiceStatus:(retrievedData)=> {
             let currentTime = new Date().getTime();
-            
-            retrievedData.forEach(datum=>{
-                if(datum.invoiceData.status === 'Due' && currentTime > datum.invoiceData.dueDate){
 
+            retrievedData.forEach(datum=>{
+                if(datum.invoiceData.amountDue === 0){
+                    datum.invoiceData.status = 'Paid';
+                }else if(datum.invoiceData.status === 'Due' && currentTime > datum.invoiceData.dueDate){
+                    datum.invoiceData.status = 'Past Due';
                 }
             });   
         },
@@ -657,7 +660,7 @@ const UICtrl = (function($){
             document.querySelector(UISelectors.itemAmount).value = retrievedItem.itemAmount;   
         },
         populateVendorSelects:(vendorData, selector) => {
-
+            $(selector).find('option:gt(0)').remove();
             const mapVendors = vendorData.map(x=> x.vendorData.vendorName)
                 .forEach((y, index)=> {
                     let option = document.createElement("option");
@@ -695,15 +698,15 @@ const UICtrl = (function($){
                     option = document.createElement("option");
                 if(x.invoiceData.status === 'Paid'){ 
                         
-                        option.text = `Vendor: ${vendorName},  Date Due: ${dueDate.getMonth()}/${dueDate.getDate()}/${dueDate.getFullYear()}`;
+                        option.text = `Vendor: ${vendorName},  Date Due: ${dueDate.getMonth()+1}/${dueDate.getDate()}/${dueDate.getFullYear()}`;
                         option.value = `${x.invoiceID}`;
                         document.querySelector(UISelectors.invoicesPaid).appendChild(option);
                 } else if(x.invoiceData.status === 'Past Due'){
-                        option.text = `Vendor: ${vendorName},  Date Due: ${dueDate.getMonth()}/${dueDate.getDate()}/${dueDate.getFullYear()}`;
+                        option.text = `Vendor: ${vendorName},  Date Due: ${dueDate.getMonth()+1}/${dueDate.getDate()}/${dueDate.getFullYear()}`;
                         option.value = `${x.invoiceID}`;
                         document.querySelector(UISelectors.invoicesPastDue).appendChild(option);
                 } else {
-                        option.text = `Vendor: ${vendorName},  Date Due: ${dueDate.getMonth()}/${dueDate.getDate()}/${dueDate.getFullYear()}`;
+                        option.text = `Vendor: ${vendorName},  Date Due: ${dueDate.getMonth()+1}/${dueDate.getDate()}/${dueDate.getFullYear()}`;
                         option.value = `${x.invoiceID}`;
                         document.querySelector(UISelectors.invoicesDue).appendChild(option);
                 }
@@ -724,11 +727,10 @@ const UICtrl = (function($){
             let issueDate = new Date(retrievedInvoice.issueDate),
                 dueDate = new Date(retrievedInvoice.dueDate);
             
-            
             document.querySelector(UISelectors.salesPersonSelect).value = retrievedInvoice.salesPerson;
             document.querySelector(UISelectors.invoiceId).value = retrievedInvoice.invoiceId;
-            document.querySelector(UISelectors.issueDate).value = `${issueDate.getMonth()}/${issueDate.getDate()}/${issueDate.getFullYear()}`;
-            document.querySelector(UISelectors.dueDate).value = `${dueDate.getMonth()}/${dueDate.getDate()}/${dueDate.getFullYear()}`;
+            document.querySelector(UISelectors.issueDate).value = `${issueDate.getMonth()+1}/${issueDate.getDate()}/${issueDate.getFullYear()}`;
+            document.querySelector(UISelectors.dueDate).value = `${dueDate.getMonth()+1}/${dueDate.getDate()}/${dueDate.getFullYear()}`;
             document.querySelector(UISelectors.invoiceSubject).value = retrievedInvoice.subject;
             document.querySelector(UISelectors.comments).value = retrievedInvoice.comments;
             document.querySelector(UISelectors.subtotal).value = retrievedInvoice.subtotal;
@@ -1039,6 +1041,11 @@ const AppCtrl = (function(StorageCtrl, ItemCtrl, UICtrl, StateCtrl, $){
         loadInvoiceData();
 
         UICtrl.populateStateSelects();
+        
+        document.querySelector(UISelectors.updateInvoice).style.display = 'none';
+        
+        document.querySelector(UISelectors.saveInvoice).style.display = 'block';  
+        
         document.querySelector(UISelectors.comments).value = '';
 
         
@@ -1111,7 +1118,7 @@ const AppCtrl = (function(StorageCtrl, ItemCtrl, UICtrl, StateCtrl, $){
         //Update State
         StateCtrl.displayBusinessState();
         
-         UICtrl.showAlert("Successfully Updated", 'alert-success py-2 d-flex justify-content-center mt-5', '#parentAlert2', '#childAlert2');
+         UICtrl.showAlert("Business Saved", 'alert-success py-2 d-flex justify-content-center mt-5', '#parentAlert2', '#childAlert2');
     }
     
     const saveInvoice = ()=> {
@@ -1233,6 +1240,8 @@ const AppCtrl = (function(StorageCtrl, ItemCtrl, UICtrl, StateCtrl, $){
         //get vendor inputs
         const vendorInputs = UICtrl.getVendorInputs();
         
+        UICtrl.populateVendorSelects(StorageCtrl.getGenericFromStorage('vendors'), UISelectors.vendorsSelect);
+        
         //update local storage
         StorageCtrl.updateVendorStorage(selectIndex, vendorInputs, key);
         
@@ -1290,7 +1299,7 @@ const AppCtrl = (function(StorageCtrl, ItemCtrl, UICtrl, StateCtrl, $){
         const businessInputs = UICtrl.getBusinessInputs();
         //get other invoice info
         const invoiceInfo = UICtrl.getInvoiceInfo();
-        
+       
         StorageCtrl.updateInvoice(key, selectedInvoiceId, retrieveItems, vendorInputs, businessInputs, invoiceInfo);
         
         //Load invoice data to populate select fields
