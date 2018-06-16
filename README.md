@@ -1,5 +1,13 @@
 # Invoicing-App
 
-[Cryptolytics](https://dkayucf.github.io/Cryptocurrency-Stock-Charting/index.html)
+[invoiceit](https://dkayucf.github.io/Invoicing-App-Local-Storage/)
 
-![cryptolytics landing page](https://github.com/dkayucf/Cryptocurrency-Stock-Charting/blob/master/assets/images/landingPage.jpg)
+![invoicing application](https://raw.githubusercontent.com/dkayucf/Invoicing-App-Local-Storage/master/assets/img/landingPage.jpg)
+
+### Technologies Used
+
+* Vanilla Javascript (Module Revealing Pattern with local storage)
+
+* HTML/CSS
+
+* Bootstrap
