@@ -1595,8 +1595,6 @@ const AppCtrl = (function(StorageCtrl, ItemCtrl, UICtrl, StateCtrl, $){
 
 
 
-
-
 Dropzone.options.logoDropZone = {
     paramName: "image", // The name that will be used to transfer the file
     maxFilesize: 2, // MB
